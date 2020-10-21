@@ -1,31 +1,214 @@
 package org.themoviedb.ui.home
 
+import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import kotlinx.android.synthetic.main.fragment_home.*
 import org.themoviedb.R
+import org.themoviedb.data.ConfigurationRepository
+import org.themoviedb.data.model.MovieResult
+import org.themoviedb.ui.detail.DetailActivity
 
 class HomeFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var moviesViewModel: MoviesViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-                ViewModelProvider(this).get(HomeViewModel::class.java)
+        moviesViewModel = ViewModelProvider(this).get(MoviesViewModel::class.java)
+        moviesViewModel.reload()
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        val textView: TextView = root.findViewById(R.id.text_home)
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
+        val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout)
+
+        moviesViewModel.latestMovie.observe(viewLifecycleOwner, { movieDetail ->
+            latestMovieImage.setOnClickListener {
+                val intent = Intent(requireContext(), DetailActivity::class.java)
+                intent.putExtra(MOVIE_ID_KEY, movieDetail.id)
+                intent.putExtra(TITLE_KEY, movieDetail.title)
+                intent.putExtra(IMAGE_KEY, movieDetail.poster_path)
+                val options = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(
+                        requireActivity(),
+                        it,
+                        getString(R.string.image_transition)
+                    )
+                startActivity(intent, options.toBundle())
+            }
+            movieDetail?.backdrop_path?.let { backdropPathImageUrl ->
+                latestMovieFrame.visibility = View.VISIBLE
+                Glide.with(this)
+                    .load(ConfigurationRepository.imageURL780 + backdropPathImageUrl)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            latestMovieFrame.visibility = View.GONE
+                            latestMovieProgressBar.visibility = View.GONE
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?, target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            latestMovieProgressBar.visibility = View.GONE
+                            return false
+                        }
+                    })
+                    .into(latestMovieImage)
+            } ?: run {
+                latestMovieFrame.visibility = View.GONE
+                latestMovieProgressBar.visibility = View.GONE
+            }
         })
+
+        //TODO Add pagination
+        moviesViewModel.nowPlayingMovies.observe(viewLifecycleOwner, { data ->
+            swipeRefreshLayout.isRefreshing = false
+            data?.let {
+                showEmptyListMessage(it.results.isEmpty())
+                nowPlayingCategory.visibility = View.VISIBLE
+                nowPlayingRecyclerView.adapter = MovieListAdapter(
+                    it,
+                    onMediaListInteractionListener()
+                )
+            }
+        })
+
+        moviesViewModel.popularMovies.observe(viewLifecycleOwner, { data ->
+            swipeRefreshLayout.isRefreshing = false
+            data?.let {
+                showEmptyListMessage(it.results.isEmpty())
+                popularCategory.visibility = View.VISIBLE
+                popularRecyclerView.adapter = MovieListAdapter(
+                    it,
+                    onMediaListInteractionListener()
+                )
+            }
+        })
+
+        moviesViewModel.topRatedMovies.observe(viewLifecycleOwner, { data ->
+            swipeRefreshLayout.isRefreshing = false
+            data?.let {
+                showEmptyListMessage(it.results.isEmpty())
+                topRatedCategory.visibility = View.VISIBLE
+                topRatedRecyclerView.adapter = MovieListAdapter(
+                    it,
+                    onMediaListInteractionListener()
+                )
+            }
+        })
+
+        moviesViewModel.upcomingMovies.observe(viewLifecycleOwner, { data ->
+            swipeRefreshLayout.isRefreshing = false
+            data?.let {
+                showEmptyListMessage(it.results.isEmpty())
+                upcomingCategory.visibility = View.VISIBLE
+                upcomingRecyclerView.adapter = MovieListAdapter(
+                    it,
+                    onMediaListInteractionListener()
+                )
+            }
+        })
+
+        swipeRefreshLayout.setOnRefreshListener {
+            moviesViewModel.reload()
+        }
+
+        moviesViewModel.getNetworkErrors().observe(viewLifecycleOwner, {
+            swipeRefreshLayout.isRefreshing = false
+            showEmptyListMessage(true)
+            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+        })
+
         return root
+    }
+
+    interface OnMediaListInteractionListener {
+        fun onMediaItemClick(mediaItem: MovieResult, imageView: View)
+    }
+
+    private fun onMediaListInteractionListener(): OnMediaListInteractionListener {
+        return object : OnMediaListInteractionListener {
+            override fun onMediaItemClick(mediaItem: MovieResult, imageView: View) {
+                val intent = Intent(requireContext(), DetailActivity::class.java)
+                intent.putExtra(MOVIE_ID_KEY, mediaItem.id)
+                intent.putExtra(TITLE_KEY, mediaItem.title)
+                intent.putExtra(IMAGE_KEY, mediaItem.poster_path)
+                val options = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(
+                        requireActivity(),
+                        imageView,
+                        getString(R.string.image_transition)
+                    )
+                startActivity(intent, options.toBundle())
+            }
+        }
+    }
+
+    private fun showEmptyListMessage(show: Boolean) {
+        if (show) {
+            emptyList.visibility = View.VISIBLE
+            nowPlayingRecyclerView.visibility = View.GONE
+            popularRecyclerView.visibility = View.GONE
+            topRatedRecyclerView.visibility = View.GONE
+            upcomingRecyclerView.visibility = View.GONE
+            nowPlayingCategory.visibility = View.INVISIBLE
+            popularCategory.visibility = View.INVISIBLE
+            topRatedCategory.visibility = View.INVISIBLE
+            upcomingCategory.visibility = View.INVISIBLE
+        } else {
+            emptyList.visibility = View.GONE
+            nowPlayingRecyclerView.visibility = View.VISIBLE
+            popularRecyclerView.visibility = View.VISIBLE
+            topRatedRecyclerView.visibility = View.VISIBLE
+            upcomingRecyclerView.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (moviesViewModel.latestMovie.hasObservers()) {
+            moviesViewModel.latestMovie.removeObservers(this)
+        }
+        if (moviesViewModel.nowPlayingMovies.hasObservers()) {
+            moviesViewModel.nowPlayingMovies.removeObservers(this)
+        }
+        if (moviesViewModel.popularMovies.hasObservers()) {
+            moviesViewModel.popularMovies.removeObservers(this)
+        }
+        if (moviesViewModel.topRatedMovies.hasObservers()) {
+            moviesViewModel.topRatedMovies.removeObservers(this)
+        }
+        if (moviesViewModel.upcomingMovies.hasObservers()) {
+            moviesViewModel.upcomingMovies.removeObservers(this)
+        }
+    }
+
+    companion object {
+        const val MOVIE_ID_KEY = "id"
+        const val TITLE_KEY = "title"
+        const val IMAGE_KEY = "image"
     }
 }

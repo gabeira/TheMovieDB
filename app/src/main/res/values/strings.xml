@@ -3,4 +3,17 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="no_results">No results</string>
+    <string name="latest">Latest</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="popular">Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="upcoming">Upcoming</string>
+
+    <string name="genre">Genre %s</string>
+    <string name="running_time">Running time %s</string>
+    <string name="vote_average">Vote average %s</string>
+
+    <string name="image_transition" translatable="false">image_transition</string>
 </resources>
