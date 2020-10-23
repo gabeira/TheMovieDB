@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val backdrop_path: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val belongs_to_collection: Any</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val imdb_id: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val original_language: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val original_title: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val poster_path: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val production_companies: List&lt;ProductionCompanies&gt;</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val production_countries: List&lt;ProductionCountries&gt;</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val release_date: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val spoken_languages: List&lt;Any&gt;</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val vote_average: Double</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$MovieDetail$val vote_count: Int</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$ProductionCompanies$val logo_path: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$ProductionCompanies$val origin_country: String</ID>
+    <ID>ConstructorParameterNaming:MovieDetail.kt$ProductionCountries$val iso_3166_1: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val backdrop_path: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val genre_ids: List&lt;Int&gt;</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val original_language: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val original_title: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val poster_path: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val release_date: String</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val vote_average: Double</ID>
+    <ID>ConstructorParameterNaming:MoviesRequest.kt$MovieResult$val vote_count: Int</ID>
+    <ID>TooGenericExceptionCaught:MoviesRepository.kt$MoviesRepository$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

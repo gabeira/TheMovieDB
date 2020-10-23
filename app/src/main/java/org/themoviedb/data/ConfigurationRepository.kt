@@ -8,10 +8,10 @@ object ConfigurationRepository {
     //TODO implement load Configuration from network
     //https://api.themoviedb.org/3/configuration?api_key=key
 
-    val baseUrl = "http://image.tmdb.org/t/p/"
-    val secureBaseUrl = "https://image.tmdb.org/t/p/"
+    const val baseUrl = "http://image.tmdb.org/t/p/"
+    const val secureBaseUrl = "https://image.tmdb.org/t/p/"
 
-    val imageURL780 = secureBaseUrl + "w780"
-    val imageURL185 = secureBaseUrl + "w185"
-    val imageURL342 = secureBaseUrl + "w342"
+    const val imageURL780 = secureBaseUrl + "w780"
+    const val imageURL185 = secureBaseUrl + "w185"
+    const val imageURL342 = secureBaseUrl + "w342"
 }
